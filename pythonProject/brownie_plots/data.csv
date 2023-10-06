@@ -1,0 +1,86 @@
+import csv
+import re
+
+# Sample data: you can read this data from a file or any other source
+log_lines = [" calculateTotalPenalty: 2 users: Average Latency = 0.015314805507659911 s, TPS = 130.59258238700272
+calculateTotalPenalty: 3 users: Average Latency = 0.011561295721266006 s, TPS = 259.4864859724813
+calculateTotalPenalty: 4 users: Average Latency = 0.009909625848134358 s, TPS = 403.64793396847193
+calculateTotalPenalty: 5 users: Average Latency = 0.010577894846598306 s, TPS = 472.6838442346518
+calculateTotalPenalty: 6 users: Average Latency = 0.009699618816375733 s, TPS = 618.5810095825913
+calculateTotalPenalty: 7 users: Average Latency = 0.01006252197992234 s, TPS = 695.6506543754177
+calculateTotalPenalty: 8 users: Average Latency = 0.010406818985939027 s, TPS = 768.7267368452402
+calculateTotalPenalty: 9 users: Average Latency = 0.011244648474234124 s, TPS = 800.3807340551829
+calculateTotalPenalty: 10 users: Average Latency = 0.011320435206095375 s, TPS = 883.358264761376
+calculateTotalPenalty: 11 users: Average Latency = 0.010320876583908543 s, TPS = 1065.8009434150476
+calculateTotalPenalty: 12 users: Average Latency = 0.009655045138465034 s, TPS = 1242.873526524783
+calculateTotalPenalty: 13 users: Average Latency = 0.009516259340139535 s, TPS = 1366.082988634627
+calculateTotalPenalty: 14 users: Average Latency = 0.009876792771475656 s, TPS = 1417.4641833563862
+calculateTotalPenalty: 15 users: Average Latency = 0.010636316935221353 s, TPS = 1410.2626023044352
+calculateTotalPenalty: 16 users: Average Latency = 0.010817275941371917 s, TPS = 1479.1154526072648
+calculateTotalPenalty: 17 users: Average Latency = 0.010691866687699862 s, TPS = 1589.9936368975814
+calculateTotalPenalty: 18 users: Average Latency = 0.010742793701313163 s, TPS = 1675.5418097435625
+calculateTotalPenalty: 19 users: Average Latency = 0.01063477407421982 s, TPS = 1786.591785344896
+calculateTotalPenalty: 20 users: Average Latency = 0.010945345958073933 s, TPS = 1827.260652756875
+calculateTotalPenalty: 21 users: Average Latency = 0.010748798885042706 s, TPS = 1953.7066629111616
+calculateTotalPenalty: 22 users: Average Latency = 0.010801806594386247 s, TPS = 2036.6963440572533
+calculateTotalPenalty: 23 users: Average Latency = 0.010530284867770431 s, TPS = 2184.1764291102004
+calculateTotalPenalty: 24 users: Average Latency = 0.010148050387700398 s, TPS = 2364.9862863401218
+calculateTotalPenalty: 25 users: Average Latency = 0.010321422576904299 s, TPS = 2422.1467354646616
+calculateTotalPenalty: 26 users: Average Latency = 0.01058485569098057 s, TPS = 2456.33958166806
+calculateTotalPenalty: 27 users: Average Latency = 0.010430159686524191 s, TPS = 2588.6468483204635
+calculateTotalPenalty: 28 users: Average Latency = 0.010372609751565117 s, TPS = 2699.4170869847962
+calculateTotalPenalty: 29 users: Average Latency = 0.009869225271816912 s, TPS = 2938.4272018609154
+calculateTotalPenalty: 30 users: Average Latency = 0.010445264445410832 s, TPS = 2872.114933689459
+calculateTotalPenalty: 31 users: Average Latency = 0.010475803959754204 s, TPS = 2959.2000880405326
+calculateTotalPenalty: 32 users: Average Latency = 0.010007718702157338 s, TPS = 3197.531920346826
+calculateTotalPenalty: 33 users: Average Latency = 0.00997422632544932 s, TPS = 3308.5272905629013
+calculateTotalPenalty: 34 users: Average Latency = 0.009712764328601315 s, TPS = 3500.5482321731743
+calculateTotalPenalty: 35 users: Average Latency = 0.009873891785031274 s, TPS = 3544.70159912626
+calculateTotalPenalty: 36 users: Average Latency = 0.009722713629404705 s, TPS = 3702.6699923696283
+calculateTotalPenalty: 37 users: Average Latency = 0.009983719576586475 s, TPS = 3706.03357958604
+calculateTotalPenalty: 38 users: Average Latency = 0.010022197899065522 s, TPS = 3791.5834812584526
+calculateTotalPenalty: 39 users: Average Latency = 0.010093186451838567 s, TPS = 3863.992821899747
+calculateTotalPenalty: 40 users: Average Latency = 0.010225393176078793 s, TPS = 3911.830020734625
+calculateTotalPenalty: 41 users: Average Latency = 0.01012381557526627 s, TPS = 4049.8564691526044
+calculateTotalPenalty: 42 users: Average Latency = 0.010053358191535586 s, TPS = 4177.708502951964
+calculateTotalPenalty: 43 users: Average Latency = 0.009868042228757874 s, TPS = 4357.500606826301
+calculateTotalPenalty: 44 users: Average Latency = 0.009772191264412618 s, TPS = 4502.572535623077
+calculateTotalPenalty: 45 users: Average Latency = 0.009770721859402125 s, TPS = 4605.596254558982
+calculateTotalPenalty: 46 users: Average Latency = 0.010145259594571762 s, TPS = 4534.137305329514
+calculateTotalPenalty: 47 users: Average Latency = 0.010132086699736035 s, TPS = 4638.7285652840355
+calculateTotalPenalty: 48 users: Average Latency = 0.009700648321045773 s, TPS = 4948.122889463267
+calculateTotalPenalty: 49 users: Average Latency = 0.00943659762946927 s, TPS = 5192.549467933162
+calculateTotalPenalty: 50 users: Average Latency = 0.009494632720947267 s, TPS = 5266.133137481865
+"
+    "calculateTotalPenalty: 2 users: Average Latency = 0.015314805507659911 s, TPS = 130.59258238700272",
+    "calculateTotalPenalty: 3 users: Average Latency = 0.011561295721266006 s, TPS = 259.4864859724813",
+    # ... (add all the data points)
+]
+
+# Create an empty list to store the rows
+rows = []
+
+# Define regular expression pattern to extract numbers
+pattern = re.compile(r"(\d+) users: Average Latency = ([\d.]+) s, TPS = ([\d.]+)")
+
+# Loop through each log line
+for line in log_lines:
+    match = pattern.search(line)
+    if match:
+        users, avg_latency, tps = match.groups()
+        rows.append([int(users), float(avg_latency), float(tps)])
+
+# Define CSV filename
+csv_filename = "metrics.csv"
+
+# Write data to CSV
+with open(csv_filename, "w", newline='') as csvfile:
+    csvwriter = csv.writer(csvfile)
+    
+    # Write header
+    csvwriter.writerow(["Users", "Average Latency", "TPS"])
+    
+    # Write rows
+    csvwriter.writerows(rows)
+
+print(f"Data saved to {data1}")

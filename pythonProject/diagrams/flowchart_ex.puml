@@ -1,0 +1,54 @@
+@startuml
+start
+
+:Constructor Initialization (owner = msg.sender, penaltyContract = _penaltyAddress);
+
+partition "Control Flow" {
+  if ("Is Function Invoke 'setEthToUsd'?") then (yes)
+    if ("Is Sender the Owner?") then (yes)
+      :Update ethToUsd;
+    else (no)
+      :Revert 'Only owner can call this function';
+    endif
+  elseif ("Is Function Invoke 'setMaticToUsd'?") then (yes)
+    if ("Is Sender the Owner?") then (yes)
+      :Update maticToUsd;
+    else (no)
+      :Revert 'Only owner can call this function';
+    endif
+  elseif ("Is Function Invoke 'calculateTotalPenalty'?") then (yes)
+    :Read Provider Data from Penalty Contract;
+    :Compute Total Penalty \n \(totalPenalty \times PENALTY_RATE\_IN\_USD\);
+  elseif ("Is Function Invoke 'requestFunds'?") then (yes)
+    if ("Is Sender the Owner?") then (yes)
+      :Emit FundsRequested;
+    else (no)
+      :Revert 'Only owner can call this function';
+    endif
+  elseif ("Is Function Invoke 'depositFunds'?") then (yes)
+    :Update User Balance;
+  elseif ("Is Function Invoke 'transferFunds'?") then (yes)
+    if ("Is Sender the Owner?") then (yes)
+      :Calculate Penalty Amount;
+      if ("Is serviceCost >= penaltyAmount?") then (yes)
+        :Compute Final Amount \n \(finalAmount = serviceCost - penaltyAmount\);
+        :Emit FundsTransferred;
+      else (no)
+        :Revert 'Penalty exceeds service cost';
+      endif
+    else (no)
+      :Revert 'Only owner can call this function';
+    endif
+  elseif ("Is Function Invoke 'withdrawFunds'?") then (yes)
+    if ("Is User Balance >= amount?") then (yes)
+      :Update User Balance;
+      :Transfer Funds;
+    else (no)
+      :Revert 'Insufficient balance';
+    endif
+  else (no)
+    :Revert 'Function not supported';
+  endif
+}
+stop
+@enduml

@@ -1,0 +1,42 @@
+@startuml
+skinparam participantPadding 40
+skinparam dpi 300
+
+participant "User" as U
+participant "EnergyProfile" as EPC
+participant "EnergyPool" as EPLC
+participant "EnergyMarket" as EMC
+database "Blockchain" as B
+
+U -> EPC: Create \n EnergyProfile NFT
+activate EPC
+EPC -> B: Store User Energy \n Profile
+deactivate EPC
+
+U -> EPC: Make Commitments \n (Production/Consumption)
+activate EPC
+EPC -> B: Update Commitments \n in Profile
+deactivate EPC
+
+U -> EPC: Deposit EnergyProfile NFT
+activate EPC
+EPC -> EPLC: Transfer NFT \n with Commitments
+deactivate EPC
+activate EPLC
+
+EPLC -> B: Update
+deactivate EPLC
+
+EPLC -> EMC: New Commitments
+activate EMC
+EMC -> B: Update \n MarketBuffer
+EMC -> B: Remove \n Expired Commitments
+EMC -> B: Process & Settle \n Commitments
+deactivate EMC
+
+U -> EMC: Withdraw NFT/Collateral
+activate EMC
+EMC -> U: Return NFT/Collateral
+deactivate EMC
+
+@enduml

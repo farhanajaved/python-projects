@@ -1,0 +1,60 @@
+@startuml sequence_diagram
+skinparam defaultFontSize 12
+
+participant "Consumer \n AD" as CAD
+participant "Provider \n AD" as PAD
+participant "DApp" as DAPP
+participant "Smart \n Contracts" as SC
+participant "IPFS" as IPFS
+participant "Chainlink \n Oracle" as ORACLE
+
+note over CAD, ORACLE: Registration and Service Selection
+group Registration
+CAD -> DAPP: Access for registration
+PAD -> DAPP: Access for registration
+DAPP -> SC: Call registrationAD.sol \n for Registration
+SC -> DAPP: Emit RegistrationEvent
+DAPP -> CAD: Confirm Registration
+end group
+
+group Service Selection
+PAD -> DAPP: Initiate Service Provision
+DAPP -> SC: Call registrationAD.sol \n for Registration
+SC -> IPFS: Store Service Details
+IPFS -> SC: Return IPFS Hash \n & Signature
+SC -> DAPP: Emit ServiceAddedEvent
+DAPP -> PAD: Confirm Service Addition
+
+CAD -> DAPP: Browse Services
+DAPP -> SC: Call serviceSelection.sol
+SC -> CAD: Return Available Services
+CAD -> SC: Call selectService Function
+SC -> DAPP: Emit ServiceSelectedEvent
+DAPP -> CAD: Confirm Service Selection
+end group
+
+
+note over CAD, ORACLE: SLA Monitoring and Penalty Assessment
+group SLA assessment
+CAD -> ORACLE: Query Oracle for KPI
+ORACLE -> SC: Log KPI on-chain \n [monitorOracle.sol]
+SC -> SC: Evaluate Breach & Record \n [recordBreach.sol]
+ORACLE -> SC: Record SLA compliance \n metrics [recordBreach.sol]
+end group
+
+note over CAD, ORACLE: Billing and Total Penalties
+group Calculate Toatl Penalties
+CAD -> SC: Initiate Billing [Billing.sol]
+SC -> SC: Query recordBreach.sol \n for Penalties
+SC -> CAD: Return Total Penalties [Billing.sol]
+CAD -> SC: Call calculateTotalPenalty [Billing.sol]
+SC -> CAD: Confirm Final \n Penalty Calculation [Billing.sol]
+end group
+
+group Funds transfer
+CAD -> SC: Initiate Funds Transfer \n [Billing.sol]
+SC -> SC: Call requestFunds \n and transferFunds [Billing.sol]
+SC -> CAD: Confirm Funds Transferred [Billing.sol]
+end group
+
+@enduml

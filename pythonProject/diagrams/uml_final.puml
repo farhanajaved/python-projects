@@ -1,0 +1,94 @@
+@startuml
+
+hide stereotype
+
+!define RECTANGLE class
+
+<style>
+RECTANGLE {
+  BackgroundColor White
+  FontColor Black
+  BorderThickness 2
+  LineThickness 2.5
+
+}
+LineThickness .5
+LineStyle 1
+</style>
+
+skinparam classBorderColor<<DApp>> DarkBlue
+skinparam classBorderColor<<registrationAD>> DarkGreen
+skinparam classBorderColor<<ServiceSelection>> DarkRed
+skinparam classBorderColor<<ServiceS>> DarkOrange
+skinparam classBorderColor<<recordBreach>>  DarkSlateGray
+skinparam classBorderColor<<monitorOracle>> DarkCyan
+skinparam classBorderColor<<ProviderAD_API>> DarkViolet
+skinparam classBorderColor<<Billing>> HotPink
+
+class DApp <<DApp>> {
+  +initiateRegistration()
+  +listServices()
+  +interactWithService(serviceID: uint)
+}
+
+class registrationAD <<registrationAD>> {
+  +registerUser()
+  +publishService()
+}
+
+class ServiceSelection <<ServiceSelection>> {
+  +selectServiceFromList(serviceID: uint)
+  +KPIforSelectedService(KPInum: uint)
+}
+
+class "Service#S" as ServiceS <<ServiceS>> {
+  +service_index(address)
+  +agreement(provider, consumer, service)
+}
+
+class recordBreach <<recordBreach>> {
+  -breaches: mapping(address => uint256)
+  +registerBreach(numBreaches: uint256)
+  +calculatePenalty(user: address)
+}
+class monitorOracle <<monitorOracle>> {
+  -apiSubscription: Object
+  +readKPI(): Object
+}
+
+interface "ProviderAD_API" <<ProviderAD_API>> <<subscribed>> {
+  +getKPI(): Object
+}
+
+class Billing <<Billing>> {
+  -owner: address
+  -penaltyContract: Penalty
+  -balances: mapping
+  +CalculateTotalPenalty()
+  +requestFunds(consumer, amount)
+  +transferFunds(provider, consumer, service)
+}
+
+'DApp and its dependencies
+DApp -down[#DarkBlue]-> registrationAD : initiates
+DApp -down[#DarkBlue]-> ServiceSelection : uses
+
+'registrationAD and its dependencies
+registrationAD -right[#DarkGreen]-> ServiceSelection : uses
+
+'ServiceSelection and its dependencies
+ServiceSelection -down[#DarkRed]-> ServiceS : instantiates
+
+'"Service#S" and its dependencies
+ServiceS -down[#DarkOrange]-> recordBreach : uses
+
+'recordBreach and its dependencies
+recordBreach -left[#DarkSlateGray]-> monitorOracle : monitors KPIs
+
+'monitorOracle and its dependencies
+monitorOracle -up[#DarkCyan]-> ProviderAD_API : subscribed
+
+'Billing and its dependencies
+Billing -up[#HotPink]-> recordBreach : dependent
+
+@enduml

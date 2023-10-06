@@ -1,0 +1,113 @@
+@startuml
+!define RECTANGLE class
+
+!define GREEN #00FF00
+!define BLUE #0000FF
+!define ORANGE #FFA500
+!define RED #FF0000
+
+!define RECTANGLE class
+
+<style>
+RECTANGLE {
+  BackgroundColor White
+  FontColor Black
+  BorderColor Black
+  BorderThickness 1
+}
+</style>
+
+class "Inter-Provider Interface (DApp)" as BCNAPI {
+  +requestTransaction(adID: String): String
+  +validateTransaction(transactionID: String): Boolean
+}
+
+class registrationAD {
+  -uniqueToken: String
+  +registerAD(adID: String): void
+  +getADDetails(adID: String): String
+}
+
+class serviceSelection {
+  -serviceList: Map
+  +addService(serviceID: String, details: String): void
+  +selectService(serviceID: String): Boolean
+  +validateService(serviceID: String): Boolean
+}
+
+class serviceS {
+  -serviceProperties: Object
+  +specificFunction(): void
+  +modifyServiceProperties(props: Object): void
+}
+
+class breachRecord {
+  -breachList: List
+  +recordBreach(breachDetails: Object): void
+  +assessPenalty(breachDetails: Object): int
+  +getBreachHistory(): List
+}
+
+class monitorOracle {
+  -realTimeData: Object
+  +fetchKPIData(): Object
+  +validateKPI(kpiData: Object): Boolean
+}
+
+class billing {
+  -billingRecords: Map
+  +handleBilling(accountID: String, amount: int): void
+  +getBillingHistory(accountID: String): Map
+}
+
+class ChainlinkOracle {
+  +getRealWorldData(): Object
+}
+
+BCNAPI ..> registrationAD : initiates
+
+registrationAD .[#DD00AA]-> serviceSelection : uses
+serviceSelection .[#DD00AA]-> serviceS : uses
+serviceSelection .[#DD00AA]->billing : uses
+breachRecord .[#DD00AA]-> monitorOracle : uses
+breachRecord .[#DD00AA]-> billing : uses
+monitorOracle .[#DD00AA]-> ChainlinkOracle : uses
+
+@enduml
+
+
+@startuml
+!define RECTANGLE class
+
+skinparam class {
+  BackgroundColor White
+  FontColor Black
+  BorderColor Black
+  BorderThickness 3
+}
+
+skinparam classBorderColor<<ServiceSelection>> Red
+
+class DApp {
+  +initiateRegistration(): void
+  +listServices(): void
+  +interactWithService(serviceID: uint): void
+}
+
+class registrationAD {
+  -User: Struct
+  -Service: Struct
+  -users: mapping(address => User)
+  -services: mapping(address => Service[])
+  +registerUser(providerProfile: String, consumerProfile: String): void
+  +addService(serviceDescription: String): void
+  +selectService(provider: address, serviceIndex: uint): void
+  +getServiceCount(provider: address): uint
+}
+
+class ServiceSelection <<ServiceSelection>> {
+  +selectServiceFromList(serviceID: uint): void
+  +validateSelectedService(serviceID: uint): Boolean
+}
+@enduml
+

@@ -1,0 +1,33 @@
+@startuml
+
+participant "CSPs" as CSPs
+participant "MNO" as MNO
+participant "Vertical SPs" as VSPs
+participant "Responsible Ministry" as Ministry
+participant "Legal Authority" as Legal
+participant "Regulation Authority" as Regulation
+participant "Public Nodes" as PNodes
+
+CSPs -> MNO: Provide infrastructure for network service
+CSPs -> MNO: Collaborate to deploy network services
+MNO -> MNO: Manage 5Gr-MANO stack & BCN
+MNO -> Regulation: Interact for regulations
+MNO -> VSPs: Handle interaction
+MNO -> PNodes: Broadcast to public blockchain
+
+group Blockchain Operations
+    PNodes -> PNodes: Act as full blockchain node
+    PNodes -> PNodes: Security operations & transactions
+    PNodes -> PNodes: Public consensus process
+end group
+
+VSPs -> MNO: Request network slice from 5Gr-MANO stack
+
+group Approval Process
+    VSPs -> Ministry: Request slice approval based on type
+    note over Ministry: Conditional branching based on request type (hospital, factory, etc.)
+    Legal -> VSPs: Check GDPR compliance & privacy
+    Regulation -> MNO: Ensure alignment with telecom regulations
+end group
+
+@enduml

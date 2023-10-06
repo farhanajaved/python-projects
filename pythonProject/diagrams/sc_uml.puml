@@ -1,0 +1,77 @@
+@startuml
+!define RECTANGLE class
+
+<style>
+RECTANGLE {
+  BackgroundColor White
+  FontColor Black
+  BorderColor Black
+  BorderThickness 3
+}
+</style>
+
+class DApp {
+  +initiateRegistration(): void
+  +listServices(): void
+  +interactWithService(serviceID: uint): void
+}
+
+class registrationAD {
+  -User: Struct
+  -Service: Struct
+  -users: mapping(address => User)
+  -services: mapping(address => Service[])
+  +registerUser(providerProfile: String, consumerProfile: String): void
+  +addService(serviceDescription: String): void
+  +selectService(provider: address, serviceIndex: uint): void
+  +getServiceCount(provider: address): uint
+}
+
+
+class ServiceSelection {
+  +selectServiceFromList(serviceID: uint): void
+  +validateSelectedService(serviceID: uint): Boolean
+}
+
+class "Service#S" {
+  -serviceProperties: Object
+  +specificFunction(): void
+  +modifyServiceProperties(props: Object): void
+}
+
+class recordBreach {
+  -breaches: mapping(address => uint256)
+  +registerBreach(numBreaches: uint256): void
+  +calculatePenalty(user: address): uint256
+}
+
+class monitorOracle {
+  -apiSubscription: Object
+  +readKPI(): Object
+}
+
+interface "ProviderAD_API" <<subscribed>> {
+  +getKPI(): Object
+}
+
+
+
+class Billing {
+  -owner: address
+  -penaltyContract: Penalty
+  -balances: mapping(address => uint256)
+  +requestFunds(consumer: address, amount: uint256): void
+  +transferFunds(provider: address, consumer: address, serviceCost: uint256): void
+}
+
+
+DApp -> registrationAD : initiates
+DApp -> ServiceSelection : uses
+registrationAD <|-- ServiceSelection: uses
+ServiceSelection *-down-> "Service#S" : instantiates
+"Service#S" --> recordBreach : uses
+recordBreach --> monitorOracle : monitors KPIs
+monitorOracle -right-> ProviderAD_API : subscribed
+Billing --> recordBreach : dependent
+
+@enduml
